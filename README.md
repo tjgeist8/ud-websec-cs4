@@ -7,7 +7,7 @@ Plain PHP, SQLite, no framework.
 ## Features
 
 - Register with a `.edu` email, sign in, sign out
-- Forgot-password / same-day reset token
+- Forgot-password / one-hour, single-use reset token (email delivery is not configured)
 - Personal vault: label, secret, notes
 - Advisor account exists in the seed data for org-wide holds
 

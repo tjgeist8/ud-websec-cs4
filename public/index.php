@@ -68,7 +68,7 @@ if ($path === "/forgot" && $method === "POST") {
     }
     render("forgot", [
         "title" => "Reset password",
-        "notice" => "If that address is in Locker, a reset link was queued for campus mail. Tokens expire at the end of the calendar day.",
+        "notice" => "If that address is in Locker, a reset request was recorded. Tokens expire after one hour.",
     ]);
 }
 
@@ -88,10 +88,14 @@ if ($path === "/reset" && $method === "POST") {
     if (strlen($password) < 8) {
         render("reset", ["title" => "Choose a new password", "email" => $email, "token" => $token, "error" => "Password needs at least eight characters."]);
     }
+    $pdo = db();
+    $pdo->beginTransaction();
     if (!consume_reset_token($email, $token)) {
-        render("reset", ["title" => "Choose a new password", "email" => $email, "token" => $token, "error" => "That reset token is not valid for this address today."]);
+        $pdo->rollBack();
+        render("reset", ["title" => "Choose a new password", "email" => $email, "token" => $token, "error" => "That reset token is invalid or expired."]);
     }
     set_user_password($email, $password);
+    $pdo->commit();
     render("login", ["title" => "Sign in", "email" => $email, "error" => "Password updated. Sign in."]);
 }
 
